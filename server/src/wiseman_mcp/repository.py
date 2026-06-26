@@ -156,7 +156,7 @@ class WikiRepo:
         ).fetchall():
             try:
                 updated = datetime.fromisoformat(r["updated_at"])
-            except ValueError:
+            except (ValueError, TypeError):
                 continue
             if updated < cutoff:
                 stale.append(r["slug"])
