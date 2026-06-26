@@ -69,3 +69,33 @@ class WikiRepo:
         ).fetchall()
         page["links"] = [r["dst_slug"] for r in link_rows]
         return page
+
+    @staticmethod
+    def _fts_query(query: str) -> str:
+        toks = [t for t in "".join(
+            c if (c.isalnum() or c.isspace()) else " " for c in query
+        ).split() if t]
+        return " OR ".join(f'"{t}"' for t in toks)
+
+    def search(self, query, kind=None, library=None, limit=10):
+        match = self._fts_query(query)
+        if not match:
+            return []
+        sql = [
+            "SELECT p.slug, p.title, p.kind, p.library, p.version, p.source,",
+            "       p.confidence,",
+            "       snippet(pages_fts, 1, '«', '»', '…', 24) AS snippet,",
+            "       bm25(pages_fts) AS score",
+            "FROM pages_fts JOIN pages p ON p.id = pages_fts.rowid",
+            "WHERE pages_fts MATCH :match",
+        ]
+        params = {"match": match, "limit": limit}
+        if kind:
+            sql.append("AND p.kind = :kind")
+            params["kind"] = kind
+        if library:
+            sql.append("AND p.library = :library")
+            params["library"] = library
+        sql.append("ORDER BY score LIMIT :limit")
+        rows = self.conn.execute("\n".join(sql), params).fetchall()
+        return [dict(r) for r in rows]
