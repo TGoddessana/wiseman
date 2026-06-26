@@ -35,10 +35,26 @@ installed) and the `/summon-wiseman` skill.
 3. New, valuable, sourced findings are filed back with `write_page` (the
    compounding loop). Run the `lint` tool occasionally to spot stale/orphan pages.
 
+## Dashboard
+
+Explore the wiki visually in a browser — a graph of pages and their links, with
+page contents, search, and lint/log panels. It is **read-only**.
+
+```
+uv run --directory <plugin>/server wiseman-dash --db .wiseman/wiki.db
+```
+
+Inside a Claude Code session you can launch it with the `!` prefix. Options:
+`--host` (default `127.0.0.1`), `--port` (default `8765`), `--no-browser`. The
+server binds to localhost only and uses no external network (graph/markdown
+libraries are vendored).
+
 ## Architecture
 
 - `server/` — generic Python FastMCP server (`uv run wiseman-mcp --db <path>`):
   tools `ask_wiseman`, `wiki_index`, `get_page`, `write_page`, `lint`.
+- `server/` (dashboard) — `wiseman-dash --db <path>`: read-only local web UI
+  (stdlib HTTP + vendored Cytoscape.js graph), `/api/*` over the same `WikiRepo`.
 - `skills/summon-wiseman/` — the build pipeline skill.
 - `templates/schema.md` — the wiki operating manual injected into `CLAUDE.md`.
 - `.wiseman/wiki.db` (per project) — SQLite single source of truth (pages/links/
