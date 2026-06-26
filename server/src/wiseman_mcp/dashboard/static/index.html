@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wiseman Dashboard</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar">
+      <h1>Wiseman</h1>
+      <input id="search" type="search" placeholder="search the wiki…">
+      <div id="filters"></div>
+      <div id="stats"></div>
+      <details id="lint-box"><summary>lint</summary><div id="lint"></div></details>
+      <details id="log-box"><summary>log</summary><div id="log"></div></details>
+    </aside>
+    <main id="graph"></main>
+    <section id="detail"><p class="empty">Click a node to read its page.</p></section>
+  </div>
+  <script src="/static/cytoscape.min.js"></script>
+  <script src="/static/marked.min.js"></script>
+  <script src="/static/app.js"></script>
+</body>
+</html>
