@@ -99,3 +99,29 @@ class WikiRepo:
         sql.append("ORDER BY score LIMIT :limit")
         rows = self.conn.execute("\n".join(sql), params).fetchall()
         return [dict(r) for r in rows]
+
+    def index(self):
+        total = self.conn.execute("SELECT COUNT(*) AS n FROM pages").fetchone()["n"]
+        by_kind = {
+            r["kind"]: r["n"]
+            for r in self.conn.execute(
+                "SELECT kind, COUNT(*) AS n FROM pages GROUP BY kind"
+            ).fetchall()
+        }
+        libraries = [
+            {"library": r["library"], "version": r["version"], "pages": r["n"]}
+            for r in self.conn.execute(
+                """SELECT library, version, COUNT(*) AS n FROM pages
+                   WHERE library IS NOT NULL
+                   GROUP BY library, version ORDER BY library"""
+            ).fetchall()
+        ]
+        pages = [
+            {"slug": r["slug"], "title": r["title"], "kind": r["kind"],
+             "library": r["library"]}
+            for r in self.conn.execute(
+                "SELECT slug, title, kind, library FROM pages ORDER BY slug"
+            ).fetchall()
+        ]
+        return {"total": total, "by_kind": by_kind,
+                "libraries": libraries, "pages": pages}
