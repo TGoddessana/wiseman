@@ -1,6 +1,6 @@
 {
   "name": "wiseman",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Summon a project-specific LLM wiki (the Wiseman) and consult it before you code.",
   "mcpServers": {
     "wiseman": {
