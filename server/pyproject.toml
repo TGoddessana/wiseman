@@ -3,7 +3,7 @@ name = "wiseman-mcp"
 version = "0.1.0"
 description = "Wiseman: per-project LLM wiki MCP server"
 requires-python = ">=3.10"
-dependencies = ["fastmcp>=2.0"]
+dependencies = ["fastmcp>=3.4,<4"]
 
 [project.scripts]
 wiseman-mcp = "wiseman_mcp.cli:main"

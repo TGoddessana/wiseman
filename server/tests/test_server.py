@@ -13,7 +13,7 @@ def test_build_server_registers_five_tools(tmp_path):
             return {t.name for t in await c.list_tools()}
 
     got = asyncio.run(names())
-    assert {"ask_wiseman", "wiki_index", "get_page", "write_page", "lint"} <= got
+    assert got == {"ask_wiseman", "wiki_index", "get_page", "write_page", "lint"}
 
 
 def test_write_then_ask_through_mcp(tmp_path):
