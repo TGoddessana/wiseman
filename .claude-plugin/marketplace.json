@@ -1,0 +1,13 @@
+{
+  "name": "wiseman",
+  "owner": {
+    "name": "tgoddessana"
+  },
+  "plugins": [
+    {
+      "name": "wiseman",
+      "source": "./",
+      "description": "Summon a project-specific LLM wiki (the Wiseman) and consult it before you code."
+    }
+  ]
+}

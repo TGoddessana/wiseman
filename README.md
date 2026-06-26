@@ -14,9 +14,15 @@ non-obvious.
 
 ## Install
 
+Add this repo as a plugin marketplace, then install from it:
+
 ```
-/plugin install wiseman
+/plugin marketplace add TGoddessana/wiseman
+/plugin install wiseman@wiseman
 ```
+
+(For local development, point the marketplace at a checkout instead:
+`/plugin marketplace add /path/to/wiseman`.)
 
 This registers the `wiseman` MCP server automatically (via `uv`, so `uv` must be
 installed) and the `/summon-wiseman` skill.
