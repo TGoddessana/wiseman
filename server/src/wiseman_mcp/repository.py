@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 
 from . import db
 
@@ -125,3 +125,40 @@ class WikiRepo:
         ]
         return {"total": total, "by_kind": by_kind,
                 "libraries": libraries, "pages": pages}
+
+    def lint(self, stale_days=180, now=None):
+        now_dt = datetime.fromisoformat(now) if now else datetime.now(timezone.utc)
+        cutoff = now_dt - timedelta(days=stale_days)
+        orphans = [
+            r["slug"] for r in self.conn.execute(
+                """SELECT slug FROM pages
+                   WHERE slug NOT IN (SELECT dst_slug FROM links)
+                   ORDER BY slug"""
+            ).fetchall()
+        ]
+        missing_source = [
+            r["slug"] for r in self.conn.execute(
+                """SELECT slug FROM pages
+                   WHERE kind='library_doc' AND (source IS NULL OR source='')
+                   ORDER BY slug"""
+            ).fetchall()
+        ]
+        missing_version = [
+            r["slug"] for r in self.conn.execute(
+                """SELECT slug FROM pages
+                   WHERE kind='library_doc' AND (version IS NULL OR version='')
+                   ORDER BY slug"""
+            ).fetchall()
+        ]
+        stale = []
+        for r in self.conn.execute(
+            "SELECT slug, updated_at FROM pages ORDER BY slug"
+        ).fetchall():
+            try:
+                updated = datetime.fromisoformat(r["updated_at"])
+            except ValueError:
+                continue
+            if updated < cutoff:
+                stale.append(r["slug"])
+        return {"orphans": orphans, "missing_source": missing_source,
+                "missing_version": missing_version, "stale": stale}
