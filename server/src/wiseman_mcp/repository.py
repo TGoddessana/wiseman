@@ -133,6 +133,36 @@ class WikiRepo:
             return {"total": total, "by_kind": by_kind,
                     "libraries": libraries, "pages": pages}
 
+    def graph(self) -> dict:
+        with self._lock:
+            nodes = [
+                {"slug": r["slug"], "title": r["title"], "kind": r["kind"],
+                 "library": r["library"], "confidence": r["confidence"]}
+                for r in self.conn.execute(
+                    "SELECT slug, title, kind, library, confidence "
+                    "FROM pages ORDER BY slug"
+                ).fetchall()
+            ]
+            slugs = {n["slug"] for n in nodes}
+            edges = [
+                {"src": r["src_slug"], "dst": r["dst_slug"]}
+                for r in self.conn.execute(
+                    "SELECT src_slug, dst_slug FROM links "
+                    "ORDER BY src_slug, dst_slug"
+                ).fetchall()
+                if r["src_slug"] in slugs and r["dst_slug"] in slugs
+            ]
+            return {"nodes": nodes, "edges": edges}
+
+    def recent_log(self, limit: int = 100) -> list[dict]:
+        with self._lock:
+            rows = self.conn.execute(
+                "SELECT ts, op, page_slug, note FROM log "
+                "ORDER BY id DESC LIMIT ?",
+                (limit,),
+            ).fetchall()
+            return [dict(r) for r in rows]
+
     def lint(self, stale_days=180, now=None) -> dict:
         with self._lock:
             now_dt = datetime.fromisoformat(now) if now else datetime.now(timezone.utc)
