@@ -1,0 +1,15 @@
+{
+  "name": "wiseman",
+  "version": "0.1.0",
+  "description": "Summon a project-specific LLM wiki (the Wiseman) and consult it before you code.",
+  "mcpServers": {
+    "wiseman": {
+      "command": "uv",
+      "args": [
+        "run", "--directory", "${CLAUDE_PLUGIN_ROOT}/server",
+        "wiseman-mcp",
+        "--db", "${CLAUDE_PROJECT_DIR}/.wiseman/wiki.db"
+      ]
+    }
+  }
+}
